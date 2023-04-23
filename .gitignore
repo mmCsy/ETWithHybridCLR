@@ -84,3 +84,6 @@ Publish/
 /Unity/Unity.ModelView.Codes.csproj
 /Unity/Unity.GenerateClient.csproj
 /Unity/Unity.GenerateServer.csproj
+Output/
+Unity/Assets/HybridCLRBuildCache/
+Unity/HybridCLRData/

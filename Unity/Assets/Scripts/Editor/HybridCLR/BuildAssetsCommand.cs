@@ -72,19 +72,17 @@ namespace HybridCLR.Editor
         [MenuItem("HybridCLR/Build/BuildAssetsAndCopyToStreamingAssets")]
         public static void BuildAndCopyABAOTHotUpdateDlls()
         {
-            BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget);
-            CopyAssetBundlesToStreamingAssets();
-            CompileDllCommand.CompileDllActiveBuildTarget();
-            CopyAOTAssembliesToStreamingAssets();
-            CopyHotUpdateAssembliesToStreamingAssets();
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            BuildAssetBundleByTarget(target);
+            CompileDllCommand.CompileDll(target);
+            CopyABAOTHotUpdateDlls(target);
         }
 
-        //[MenuItem("HybridCLR/Build/Copy_AB_AOT_HotUpdateDlls")]
-        public static void Copy_AB_AOT_HotUpdateDlls()
+        public static void CopyABAOTHotUpdateDlls(BuildTarget target)
         {
+            CopyAssetBundlesToStreamingAssets(target);
             CopyAOTAssembliesToStreamingAssets();
             CopyHotUpdateAssembliesToStreamingAssets();
-            CopyAssetBundlesToStreamingAssets();
         }
 
 
@@ -100,18 +98,18 @@ namespace HybridCLR.Editor
             string aotAssembliesSrcDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
             string aotAssembliesDstDir = Application.streamingAssetsPath;
 
-            // foreach (var dll in LoadDll.AOTMetaAssemblyNames)
-            // {
-            //     string srcDllPath = $"{aotAssembliesSrcDir}/{dll}";
-            //     if (!File.Exists(srcDllPath))
-            //     {
-            //         Debug.LogError($"ab中添加AOT补充元数据dll:{srcDllPath} 时发生错误,文件不存在。裁剪后的AOT dll在BuildPlayer时才能生成，因此需要你先构建一次游戏App后再打包。");
-            //         continue;
-            //     }
-            //     string dllBytesPath = $"{aotAssembliesDstDir}/{dll}.bytes";
-            //     File.Copy(srcDllPath, dllBytesPath, true);
-            //     Debug.Log($"[CopyAOTAssembliesToStreamingAssets] copy AOT dll {srcDllPath} -> {dllBytesPath}");
-            // }
+            foreach (var dll in SettingsUtil.AOTAssemblyNames)
+            {
+                string srcDllPath = $"{aotAssembliesSrcDir}/{dll}.dll";
+                if (!File.Exists(srcDllPath))
+                {
+                    Debug.LogError($"ab中添加AOT补充元数据dll:{srcDllPath} 时发生错误,文件不存在。裁剪后的AOT dll在BuildPlayer时才能生成，因此需要你先构建一次游戏App后再打包。");
+                    continue;
+                }
+                string dllBytesPath = $"{aotAssembliesDstDir}/{dll}.dll.bytes";
+                File.Copy(srcDllPath, dllBytesPath, true);
+                Debug.Log($"[CopyAOTAssembliesToStreamingAssets] copy AOT dll {srcDllPath} -> {dllBytesPath}");
+            }
         }
 
         public static void CopyHotUpdateAssembliesToStreamingAssets()
@@ -120,7 +118,11 @@ namespace HybridCLR.Editor
 
             string hotfixDllSrcDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);
             string hotfixAssembliesDstDir = Application.streamingAssetsPath;
+#if NEW_HYBRIDCLR_API
+            foreach (var dll in SettingsUtil.HotUpdateAssemblyFilesExcludePreserved)
+#else
             foreach (var dll in SettingsUtil.HotUpdateAssemblyFiles)
+#endif
             {
                 string dllPath = $"{hotfixDllSrcDir}/{dll}";
                 string dllBytesPath = $"{hotfixAssembliesDstDir}/{dll}.bytes";
@@ -129,9 +131,8 @@ namespace HybridCLR.Editor
             }
         }
 
-        public static void CopyAssetBundlesToStreamingAssets()
+        public static void CopyAssetBundlesToStreamingAssets(BuildTarget target)
         {
-            var target = EditorUserBuildSettings.activeBuildTarget;
             string streamingAssetPathDst = Application.streamingAssetsPath;
             Directory.CreateDirectory(streamingAssetPathDst);
             string outputDir = GetAssetBundleOutputDirByTarget(target);

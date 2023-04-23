@@ -197,8 +197,8 @@ namespace ET
 		[MenuItem("HybridCLR/Build/BuildETAssetsAndCopyToStreamingAssets")]
 		public static void BuildAndCopyABAOTHotUpdateDlls()
 		{
-			BuildAssetsCommand.BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget);
-			BuildAssetsCommand.CopyAssetBundlesToStreamingAssets();
+            BuildAssetsCommand.BuildAssetBundleByTarget(EditorUserBuildSettings.activeBuildTarget);
+			BuildAssetsCommand.CopyAssetBundlesToStreamingAssets(EditorUserBuildSettings.activeBuildTarget);
 			HybridCLR.Editor.Commands.CompileDllCommand.CompileDllActiveBuildTarget();
 			//BuildAssetsCommand.CopyAOTAssembliesToStreamingAssets();
 			BuildHelper.CopyAOTAssembliesToStreamingAssets();
