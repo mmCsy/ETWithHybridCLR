@@ -23,7 +23,8 @@ namespace ET
 			"Unity.ThirdParty.dll",
 			"Unity.Loader.dll",
 			"MongoDB.Bson.dll",
-		};
+            "Assembly-CSharp.dll"
+        };
 
 		public void Start(MonoBehaviour initMono)
 		{

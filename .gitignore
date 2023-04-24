@@ -87,3 +87,5 @@ Publish/
 Output/
 Unity/Assets/HybridCLRBuildCache/
 Unity/HybridCLRData/
+Unity/Bundles/
+Unity/BundlesCache/
